@@ -1,2 +1,8 @@
 .vscode
 *.tgz
+*.aux
+*.glob
+*.vo
+*.vok
+*.vos
+*Makefile*
