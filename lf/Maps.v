@@ -187,7 +187,8 @@ Proof. reflexivity. Qed.
 Lemma t_apply_empty : forall (A : Type) (x : string) (v : A),
   (__ !-> v) x = v.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  unfold t_empty. reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, optional (t_update_eq)
@@ -199,7 +200,8 @@ Proof.
 Lemma t_update_eq : forall (A : Type) (m : total_map A) x v,
   (x !-> v ; m) x = v.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros. unfold t_update. rewrite String.eqb_refl. reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, optional (t_update_neq)
@@ -212,7 +214,10 @@ Theorem t_update_neq : forall (A : Type) (m : total_map A) x1 x2 v,
   x1 <> x2 ->
   (x1 !-> v ; m) x2 = m x2.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros. 
+  unfold t_update. rewrite <- String.eqb_neq in H. rewrite H.
+  reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, optional (t_update_shadow)
@@ -226,7 +231,10 @@ Proof.
 Lemma t_update_shadow : forall (A : Type) (m : total_map A) x v1 v2,
   (x !-> v2 ; x !-> v1 ; m) = (x !-> v2 ; m).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros. unfold t_update.
+  apply functional_extensionality.
+  intros x'. destruct (x =? x')%string. reflexivity. reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard (t_update_same)
@@ -243,7 +251,9 @@ Proof.
 Theorem t_update_same : forall (A : Type) (m : total_map A) x,
   (x !-> m x ; m) = m.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros. unfold t_update. apply functional_extensionality.
+  intros x'. destruct (eqb_spec x x'). rewrite e. reflexivity. reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 3 stars, standard, especially useful (t_update_permute)
@@ -259,7 +269,18 @@ Theorem t_update_permute : forall (A : Type) (m : total_map A)
   =
   (x2 !-> v2 ; x1 !-> v1 ; m).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros. apply functional_extensionality.
+  unfold t_update. intros x.
+  destruct (String.eqb_spec x x1) as [e1 | ne1], 
+           (String.eqb_spec x x2) as [e2 | ne2].
+  - rewrite e2 in e1. apply H in e1. destruct e1.
+  - rewrite e1. rewrite String.eqb_refl. rewrite <- String.eqb_neq in H.
+    rewrite H. reflexivity.
+  - rewrite e2. rewrite String.eqb_refl. rewrite <- String.eqb_neq in H.
+    rewrite eqb_sym. rewrite H. reflexivity.
+  - rewrite <- String.eqb_neq in ne1.
+    rewrite eqb_sym in ne1. rewrite ne1. reflexivity.
+Qed.
 (** [] *)
 
 (* ################################################################# *)
