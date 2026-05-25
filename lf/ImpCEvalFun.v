@@ -209,16 +209,21 @@ Proof. reflexivity. Qed.
    [X] (inclusive -- i.e., [1 + 2 + ... + X]) in the variable [Y].  Make
    sure your solution satisfies the test that follows. *)
 
-Definition pup_to_n : com
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Definition pup_to_n : com :=
+  <{
+    while X > 0 do
+      Y := Y + X;
+      X := X - 1
+    end
+  }>.
 
 Example pup_to_n_1 :
   test_ceval (X !-> 5) pup_to_n
   = Some (0, 15, 0).
-(* FILL IN HERE *) Admitted.
-(*
+(* FILL IN HERE Admitted. *)
+
 Proof. reflexivity. Qed.
-*)
+
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, optional (peven)
@@ -227,6 +232,16 @@ Proof. reflexivity. Qed.
     sets [Z] to [1] otherwise.  Use [test_ceval] to test your
     program. *)
 
+Definition peven : com :=
+  <{
+    Z := X;
+    while Z > 1 do
+      Z := Z - 2
+    end
+  }>.
+
+Example peven_1 : test_ceval (X !-> 5) peven = Some (5, 0, 1).
+Proof. reflexivity. Qed.
 (* FILL IN HERE
 
     [] *)
@@ -361,8 +376,24 @@ Theorem ceval__ceval_step: forall c st st',
       exists i, ceval_step st c i = Some st'.
 Proof.
   intros c st st' Hce.
-  induction Hce.
-  (* FILL IN HERE *) Admitted.
+  induction Hce; 
+  try (exists 1; subst; reflexivity);
+  try destruct IHHce as [i IHHce];
+  try ( destruct IHHce1 as [i1 IHHce1];
+        destruct IHHce2 as [i2 IHHce2] );
+  try (exists (S i); simpl; rewrite H; apply IHHce).
+  - exists (S (i1 + i2)). simpl. 
+    assert (H1 : ceval_step st c1 (i1 + i2) = Some st').
+    { apply ceval_step_more with i1. lia. apply IHHce1. }
+    assert (H2 : ceval_step st' c2 (i1 + i2) = Some st'').
+    { apply ceval_step_more with i2. lia. apply IHHce2. }
+    rewrite H1, H2. reflexivity.
+  - exists 1. simpl. rewrite H. reflexivity.
+  - exists (S (i1 + i2)). simpl. rewrite H.
+    apply (ceval_step_more i1 (i1 + i2) st st') in IHHce1.
+    apply (ceval_step_more i2 (i1 + i2) st' st'') in IHHce2.
+    rewrite IHHce1, IHHce2. reflexivity. lia. lia.
+Qed.
 (** [] *)
 
 Theorem ceval_and_ceval_step_coincide: forall c st st',
