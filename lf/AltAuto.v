@@ -183,11 +183,15 @@ Theorem andb_eq_orb :
   forall (b c : bool),
   (andb b c = orb b c) ->
   b = c.
-Proof. (* FILL IN HERE *) Admitted.
+Proof. 
+  intros. destruct b, c; try reflexivity; try (simpl in H; discriminate H).
+Qed.
 
 Theorem add_assoc : forall n m p : nat,
     n + (m + p) = (n + m) + p.
-Proof. (* FILL IN HERE *) Admitted.
+Proof.
+  induction n; intros m p; simpl; try rewrite IHn; try reflexivity.
+Qed. 
 
 Fixpoint nonzeros (lst : list nat) :=
   match lst with
@@ -198,8 +202,11 @@ Fixpoint nonzeros (lst : list nat) :=
 
 Lemma nonzeros_app : forall lst1 lst2 : list nat,
   nonzeros (lst1 ++ lst2) = (nonzeros lst1) ++ (nonzeros lst2).
-Proof. (* FILL IN HERE *) Admitted.
-
+Proof.
+  intros. induction lst1 as [| n lst1 IHlst1].
+  - simpl. reflexivity.
+  - destruct n; simpl; rewrite IHlst1; reflexivity.
+Qed.
 (** [] *)
 
 (** Using [try] and [;] together, we can improve the proof about
@@ -283,7 +290,7 @@ Qed.
 
 Theorem add_assoc' : forall n m p : nat,
     n + (m + p) = (n + m) + p.
-Proof. (* FILL IN HERE *) Admitted.
+Proof.  intros. induction n; simpl; [| rewrite IHn]; reflexivity. Qed. 
 
 (** [] *)
 
@@ -352,7 +359,7 @@ Qed.
     Prove that 100 is even. Your proof script should be quite short. *)
 
 Theorem ev100: ev 100.
-Proof. (* FILL IN HERE *) Admitted.
+Proof. repeat apply ev_SS. apply ev_0. Qed.
 
 (** [] *)
 
@@ -540,7 +547,7 @@ Proof.
       * apply MUnionR. apply IH.
       * apply MUnionR. apply IH.
       * apply MUnionR. apply IH.
- - (* MStar0 *) simpl.
+  - (* MStar0 *) simpl.
     destruct re.
     + apply MEmpty.
     + apply MEmpty.
@@ -555,22 +562,22 @@ Proof.
       * apply MStar0.
       * apply MStar0.
       * apply MStar0.
- - (* MStarApp *) simpl.
-   destruct re.
-   + inversion IH1.
-   + inversion IH1. inversion IH2. apply MEmpty.
-   + apply star_app.
-     * apply MStar1. apply IH1.
-     * apply IH2.
-   + apply star_app.
-     * apply MStar1.  apply IH1.
-     * apply IH2.
-   + apply star_app.
-     * apply MStar1.  apply IH1.
-     * apply IH2.
-   + apply star_app.
-     * apply MStar1.  apply IH1.
-     * apply IH2.
+  - (* MStarApp *) simpl.
+    destruct re.
+    + inversion IH1.
+    + inversion IH1. inversion IH2. apply MEmpty.
+    + apply star_app.
+      * apply MStar1. apply IH1.
+      * apply IH2.
+    + apply star_app.
+      * apply MStar1.  apply IH1.
+      * apply IH2.
+    + apply star_app.
+      * apply MStar1.  apply IH1.
+      * apply IH2.
+    + apply star_app.
+      * apply MStar1.  apply IH1.
+      * apply IH2.
 Qed.
 
 (* Use the tacticals described so far to shorten the proof. The proof
@@ -587,7 +594,27 @@ Qed.
 Lemma re_opt_match' : forall T (re: reg_exp T) s,
   s =~ re -> s =~ re_opt re.
 Proof.
-(* FILL IN HERE *) Admitted.
+  intros T re s M.
+  induction M
+    as [| x'
+        | s1 re1 s2 re2 Hmatch1 IH1 Hmatch2 IH2
+        | s1 re1 re2 Hmatch IH | s2 re1 re2 Hmatch IH
+        | re | s1 s2 re Hmatch1 IH1 Hmatch2 IH2];
+        simpl; try apply MEmpty; try apply MChar; simpl;
+    try ( destruct re1; 
+    [ inversion IH1 | inversion IH1; destruct re2; apply IH2 | | | | ];
+    ( destruct re2;
+    [ inversion IH2 | inversion IH2; rewrite app_nil_r; apply IH1 | | | | ]; 
+    apply MApp; try apply IH1; try apply IH2 ) );
+    try ( destruct re1; [inversion IH | | | | | ];
+    destruct re2; try apply IH; apply MUnionL; apply IH );
+    try ( destruct re1; [apply IH | | | | | ];
+    ( destruct re2; [inversion IH | | | | | ]; apply MUnionR; apply IH ) );
+    try ( destruct re; try destruct re; try apply MEmpty; apply MStar0 );
+    ( destruct re; 
+    [ inversion IH1 | inversion IH1; inversion IH2; apply MEmpty | | | | ];
+    ( apply star_app; [apply MStar1;  apply IH1 | apply IH2] ) ).
+Qed.
 (* Do not modify the following line: *)
 Definition manual_grade_for_re_opt : option (nat*string) := None.
 (** [] *)
@@ -922,20 +949,20 @@ Qed.
 
 Theorem plus_id_exercise_from_basics : forall n m o : nat,
   n = m -> m = o -> n + m = m + o.
-Proof. (* FILL IN HERE *) Admitted.
+Proof. lia. Qed.
 
 Theorem add_assoc_from_induction : forall n m p : nat,
     n + (m + p) = (n + m) + p.
-Proof. (* FILL IN HERE *) Admitted.
+Proof. lia. Qed.
 
 Theorem S_injective_from_tactics : forall (n m : nat),
   S n = S m ->
   n = m.
-Proof. (* FILL IN HERE *) Admitted.
+Proof. lia. Qed.
 
 Theorem or_distributes_over_and_from_logic : forall P Q R : Prop,
     P \/ (Q /\ R) <-> (P \/ Q) /\ (P \/ R).
-Proof. (* FILL IN HERE *) Admitted.
+Proof. intuition. Qed.
 
 (** [] *)
 
@@ -1134,10 +1161,30 @@ Qed.
     very long proof, and shorten it, rather than starting with
     [re_opt_match']; but, either way can work. *)
 
+
+Create HintDb re_db.
+Hint Constructors exp_match : re_db.
+Hint Resolve star_app : re_db.
+
 Lemma re_opt_match'' : forall T (re: reg_exp T) s,
   s =~ re -> s =~ re_opt re.
 Proof.
-(* FILL IN HERE *) Admitted.
+  intros T re s M.
+  induction M
+    as [| x'
+        | s1 re1 s2 re2 Hmatch1 IH1 Hmatch2 IH2
+        | s1 re1 re2 Hmatch IH | s2 re1 re2 Hmatch IH
+        | re | s1 s2 re Hmatch1 IH1 Hmatch2 IH2];
+        simpl; [ | | destruct re1; 
+    [ inversion IH1 | inversion IH1; destruct re2; auto | | | | ];
+    ( destruct re2;
+    [ inversion IH2 | inversion IH2; rewrite app_nil_r | | | | ] ) |
+    destruct re1; [ inversion IH | | | | | ]; destruct re2 |
+    destruct re1; ( destruct re2; [ inversion IH | | | | | ] ) |
+    destruct re; try destruct re |
+    destruct re;  [ inversion IH1 | inversion IH1; inversion IH2 | | | | ] ]; 
+    auto with re_db.
+Qed.
 (* Do not modify the following line: *)
 Definition manual_grade_for_re_opt_match'' : option (nat*string) := None.
 (** [] *)
@@ -1372,7 +1419,7 @@ Qed.
 
 Theorem andb3_exchange :
   forall b c d, andb (andb b c) d = andb (andb b d) c.
-Proof. (* FILL IN HERE *) Admitted.
+Proof. intros b c d; destructpf b; destructpf c; destructpf d. Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard (andb_true_elim2)
@@ -1394,16 +1441,16 @@ Qed.
     own, improved version of [destructpf]. Use it to prove the
     theorem. *)
 
-(*
-Ltac destructpf' x := ...
-*)
+
+Ltac destructpf' x := 
+  destruct x; simpl; intros; subst; try reflexivity; try discriminate.
 
 (** Your one-shot proof should need only [intros] and
     [destructpf']. *)
 
 Theorem andb_true_elim2' : forall b c : bool,
     andb b c = true -> c = true.
-Proof. (* FILL IN HERE *) Admitted.
+Proof. intros b c. destructpf' b. Qed.
 
 (** Double-check that [intros] and your new [destructpf'] still
     suffice to prove this earlier theorem -- i.e., that your improved
@@ -1411,7 +1458,7 @@ Proof. (* FILL IN HERE *) Admitted.
 
 Theorem andb3_exchange' :
   forall b c d, andb (andb b c) d = andb (andb b d) c.
-Proof. (* FILL IN HERE *) Admitted.
+Proof. intros b c d; destructpf' b; destructpf' c; destructpf' d. Qed.
 (** [] *)
 
 (* ================================================================= *)
@@ -1789,7 +1836,19 @@ Qed.
     to expand it to handle conjunctions, negations, bi-implications,
     and [nor]. *)
 
-(* Ltac nor_intuition := ... *)
+Ltac nor_intuition :=
+  repeat match goal with
+         | [ H : ?P |- ?P ] => apply H
+         | [ |- forall _, _ ] => intro
+         | [ H1 : ?P -> ?Q, H2 : ?P |- _ ] => apply H1 in H2
+         | [ |- _ <-> _ ] => split
+         | [ H : nor ?P ?Q |- _ ] => destruct H
+         | [ |- nor ?P ?Q ] => apply stroke
+         | [ |- ~ _ ] => unfold not
+         | [ H : ~ _ |- _ ] => unfold not in H
+         | [ H : ?P /\ ?Q |- _ ] => destruct H
+         | [ H : False |- _ ] => destruct H
+         end.
 
 (** Each of the three theorems below, and many others involving these
     logical connectives, should be provable with just
@@ -1797,15 +1856,15 @@ Qed.
 
 Theorem nor_comm' : forall (P Q : Prop),
     nor P Q <-> nor Q P.
-Proof. (* FILL IN HERE *) Admitted.
+Proof. nor_intuition. Qed.
 
 Theorem nor_not' : forall (P : Prop),
     nor P P <-> ~P.
-Proof. (* FILL IN HERE *) Admitted.
+Proof. nor_intuition. Qed.
 
 Theorem nor_not_and' : forall (P Q : Prop),
     nor P Q -> ~ (P /\ Q).
-Proof. (* FILL IN HERE *) Admitted.
+Proof. nor_intuition. Qed.
 (* Do not modify the following line: *)
 Definition manual_grade_for_nor_intuition : option (nat*string) := None.
 (** [] *)
