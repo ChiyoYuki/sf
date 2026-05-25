@@ -2984,6 +2984,7 @@ Admitted.
 
 Inductive pal {X:Type} : list X -> Prop :=
   | palEmp : pal nil
+  | palOne x : pal [x]
   | palEle x l (H : pal l) : pal (x :: l ++ [x])
 .
 
@@ -2998,7 +2999,11 @@ Qed.
 
 Theorem pal_rev : forall (X:Type) (l: list X) , pal l -> l = rev l.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros X l H. induction H.
+  - reflexivity.
+  - reflexivity.
+  - simpl. rewrite rev_app_distr, <- IHpal. reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 5 stars, standard, optional (palindrome_converse)
