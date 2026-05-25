@@ -231,7 +231,7 @@ Hint Unfold is_fortytwo : core.
 Example auto_example_7' : forall x,
   (x <= 42 /\ 42 <= x) -> is_fortytwo x.
 Proof.
-  auto. (* try also: info_auto. *)
+  info_auto. (* try also: info_auto. *)
 Qed.
 
 (** Note that the [Hint Unfold is_fortytwo] command above the
@@ -390,6 +390,7 @@ Proof.
     hypotheses to rewrite with. *)
 
 Ltac find_eqn :=
+
   match goal with
     H1: forall x, ?P x -> ?L = ?R,
     H2: ?P ?X
