@@ -437,6 +437,10 @@ Print Permutation.
      - 2. If [Permutation al bl], then [Permutation bl al].
      - 3. [[1;1]] is NOT a permutation of [[1;2]].
      - 4. [[1;2;3;4]] IS a permutation of [[3;4;2;1]].
+     - 5. If [Permutation al bl], then [forall x, In x al -> In x bl].
+     - 6. If [Permutation al bl /\ al <> bl], 
+          then [exist i j, al[i] <> bl[i] /\ al[j] <> bl[j]].
+     - 7. [[]] IS a permutation of [[]].
 
    YOUR TASK: Add three more properties. Write them here: *)
 
@@ -449,6 +453,8 @@ Search Permutation.  (* Browse through the results of this query! *)
     been proved as theorems by the Coq library developers?  Answer
     here:
 
+    Permutation_in
+    perm_nil
 *)
 (* Do not modify the following line: *)
 Definition manual_grade_for_Permutation_properties : option (nat*string) := None.
@@ -534,8 +540,14 @@ Check app_comm_cons.
 Example permut_example: forall (a b: list nat),
   Permutation (5 :: 6 :: a ++ b) ((5 :: b) ++ (6 :: a ++ [])).
 Proof.
-(* FILL IN HERE *) Admitted.
-(** [] *)
+  intros.
+  simpl. rewrite app_nil_r.
+  apply perm_skip.
+  apply perm_trans with ((6 :: a) ++ b).
+  - simpl. apply Permutation_refl.
+  - apply Permutation_app_comm.
+Qed.
+(** [] *) 
 
 (** **** Exercise: 2 stars, standard (not_a_permutation)
 
@@ -548,7 +560,11 @@ Check Permutation_length_1_inv.
 Example not_a_permutation:
   ~ Permutation [1;1] [1;2].
 Proof.
-(* FILL IN HERE *) Admitted.
+  unfold not. intros contra.
+  apply Permutation_cons_inv in contra.
+  apply Permutation_length_1_inv in contra.
+  discriminate contra.
+Qed.
 (** [] *)
 
 (* ================================================================= *)
@@ -614,7 +630,13 @@ Theorem Forall_perm: forall {A} (f: A -> Prop) al bl,
   Permutation al bl ->
   Forall f al -> Forall f bl.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros A f al bl HP.
+  induction HP.
+  - intros H. apply H.
+  - intros H. inv H. auto.
+  - intros H. inv H. inv H3. auto.
+  - intros H. apply IHHP2. apply IHHP1. apply H.
+Qed.   
 (** [] *)
 
 (* ################################################################# *)
