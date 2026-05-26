@@ -22,4 +22,5 @@ lf/impdriver
 
 .vscode
 
-*Makefile*
+Makefile.*
+*.d
